@@ -1,0 +1,935 @@
+# Golden Dataset for arXiv Research Agent
+#
+# Schema:
+#   id: unique question identifier
+#   question: the user-facing question
+#   category: literature_review | comparison | specific_result | explain_paper | trap | edge_case
+#
+#   retrieval_requirements:
+#     type: none | topical | specific_paper
+#       - none: no retrieval needed (traps, edge cases, malformed input)
+#       - topical: agent must retrieve papers about specific topics
+#       - specific_paper: agent must fetch a specific arxiv_id (used for explain-a-paper)
+#     required_topics: [list of topics that must be covered]
+#     minimum_papers_per_topic: how many relevant papers per topic
+#     minimum_total_papers: total papers needed across all topics
+#     required_paper: specific arxiv_id (only for type=specific_paper)
+#
+#   synthesis_requirements:
+#     must_address: [things the answer must address]
+#     must_avoid: [things the answer must not do]
+#     target_length_words: expected length range
+#     expected_question_type: literature_review | comparison | explain_paper | specific_result | cannot_answer
+#
+#   refusal_requirements:
+#     should_refuse: true | false
+#     refusal_reason: what the agent should say
+#
+# Evaluation strategy:
+#   - Retrieval check: deterministic, scriptable. Checks paper titles/abstracts against required_topics.
+#   - Synthesis check: LLM-as-judge with rubric against synthesis_requirements.
+#   - Refusal check: binary check on whether agent declined when it should.
+#
+# Total: 60 questions across 6 categories
+
+# =============================================================================
+# CATEGORY A: LITERATURE REVIEW (15 questions)
+# Tests: coverage, filtering, synthesis, citation accuracy
+# =============================================================================
+
+- id: 1
+  question: "Give me a literature review on RLHF, covering the canonical papers and their relationships."
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["RLHF", "reinforcement learning from human feedback"]
+    minimum_total_papers: 4
+  synthesis_requirements:
+    must_address:
+      - "Identifies foundational papers (e.g., InstructGPT, DPO, Constitutional AI commonly cited)"
+      - "Explains relationships between papers (which extends which)"
+      - "Distinguishes original methods from variations"
+    must_avoid:
+      - "Fabricating paper titles or arxiv IDs"
+      - "Treating recent variants as foundational"
+    target_length_words: "800-1500"
+    expected_question_type: literature_review
+
+- id: 2
+  question: "What are the foundational papers on Retrieval-Augmented Generation?"
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["RAG", "retrieval-augmented generation"]
+    minimum_total_papers: 3
+  synthesis_requirements:
+    must_address:
+      - "Identifies the original RAG paper (Lewis et al.) or equivalent foundational work"
+      - "Distinguishes retrieval methods from generation methods"
+    must_avoid: ["Fabrication"]
+    target_length_words: "600-1200"
+    expected_question_type: literature_review
+
+- id: 3
+  question: "Walk me through the key papers on parameter-efficient fine-tuning (LoRA, adapters, prefix tuning)."
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["LoRA", "adapters", "prefix tuning"]
+    minimum_papers_per_topic: 1
+  synthesis_requirements:
+    must_address:
+      - "Covers each named technique"
+      - "Explains parameter efficiency tradeoffs"
+    must_avoid: ["Conflating techniques", "Fabrication"]
+    target_length_words: "800-1500"
+    expected_question_type: literature_review
+
+- id: 4
+  question: "Give me a literature review on chain-of-thought prompting."
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["chain-of-thought", "CoT"]
+    minimum_total_papers: 3
+  synthesis_requirements:
+    must_address:
+      - "Identifies the Wei et al. 2022 paper or equivalent foundational work"
+      - "Discusses variants (zero-shot CoT, self-consistency, etc.) if relevant"
+    must_avoid: ["Fabrication"]
+    target_length_words: "600-1200"
+    expected_question_type: literature_review
+
+- id: 5
+  question: "What are the foundational papers on attention mechanisms in transformers?"
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["attention", "transformer"]
+    minimum_total_papers: 2
+  synthesis_requirements:
+    must_address:
+      - "Identifies 'Attention Is All You Need' (Vaswani et al.) as foundational"
+      - "May discuss precursors (Bahdanau attention) or successors (FlashAttention)"
+    must_avoid: ["Fabrication"]
+    target_length_words: "600-1200"
+    expected_question_type: literature_review
+
+- id: 6
+  question: "Give me a literature review on speculative decoding methods."
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["speculative decoding"]
+    minimum_total_papers: 3
+  synthesis_requirements:
+    must_address:
+      - "Identifies the Leviathan et al. or Chen et al. 2022/2023 papers as foundational"
+      - "Discusses variants (Medusa, lookahead decoding, etc.) if covered"
+    must_avoid: ["Fabrication"]
+    target_length_words: "800-1500"
+    expected_question_type: literature_review
+
+- id: 7
+  question: "Survey the major approaches to reducing LLM hallucinations."
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["hallucination", "factuality"]
+    minimum_total_papers: 4
+  synthesis_requirements:
+    must_address:
+      - "Distinguishes prompting-based, RAG-based, and training-based approaches"
+      - "Acknowledges this is an active research area without consensus"
+    must_avoid: ["Overconfident claims about which approach 'works best'"]
+    target_length_words: "1000-1800"
+    expected_question_type: literature_review
+
+- id: 8
+  question: "What are the key papers on agent reasoning patterns (ReAct, Reflexion, Tree-of-Thoughts, etc.)?"
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["ReAct", "Reflexion", "Tree of Thoughts"]
+    minimum_papers_per_topic: 1
+  synthesis_requirements:
+    must_address:
+      - "Covers each named technique with its specific paper"
+      - "Distinguishes the contribution of each"
+    must_avoid: ["Conflating techniques", "Fabrication"]
+    target_length_words: "800-1500"
+    expected_question_type: literature_review
+
+- id: 9
+  question: "Give me a literature review on LLM evaluation methodologies."
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["LLM evaluation", "benchmark"]
+    minimum_total_papers: 4
+  synthesis_requirements:
+    must_address:
+      - "Distinguishes benchmark-based (HELM, MMLU) from LLM-as-judge approaches"
+      - "Covers calibration concerns"
+    must_avoid: ["Fabrication"]
+    target_length_words: "1000-1800"
+    expected_question_type: literature_review
+
+- id: 10
+  question: "What are the major papers on quantization techniques for LLMs?"
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["quantization", "LLM compression"]
+    minimum_total_papers: 3
+  synthesis_requirements:
+    must_address:
+      - "Covers post-training quantization (GPTQ, AWQ) and quantization-aware training if relevant"
+      - "Distinguishes weight-only vs activation quantization"
+    must_avoid: ["Fabrication"]
+    target_length_words: "800-1500"
+    expected_question_type: literature_review
+
+- id: 11
+  question: "Survey the recent literature on agentic safety and misalignment."
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["agent safety", "misalignment"]
+    minimum_total_papers: 3
+  synthesis_requirements:
+    must_address:
+      - "Acknowledges this is an emerging area"
+      - "Discusses concrete examples of agentic misuse or misalignment"
+    must_avoid: ["Speculation presented as findings"]
+    target_length_words: "800-1500"
+    expected_question_type: literature_review
+
+- id: 12
+  question: "What are the key papers on long-context extension techniques?"
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["long context", "context extension"]
+    minimum_total_papers: 3
+  synthesis_requirements:
+    must_address:
+      - "Covers techniques like RoPE scaling, ALiBi, sliding window attention"
+      - "Discusses the 'needle in a haystack' evaluation paradigm if relevant"
+    must_avoid: ["Fabrication"]
+    target_length_words: "800-1500"
+    expected_question_type: literature_review
+
+- id: 13
+  question: "Give me a literature review on multi-agent LLM systems and their tradeoffs."
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["multi-agent", "agent systems"]
+    minimum_total_papers: 3
+  synthesis_requirements:
+    must_address:
+      - "Acknowledges contested nature (multi-agent vs single-agent debate)"
+      - "Covers practical multi-agent papers (CAMEL, AutoGen, etc.) if relevant"
+    must_avoid: ["Presenting one side as consensus"]
+    target_length_words: "800-1500"
+    expected_question_type: literature_review
+
+- id: 14
+  question: "Survey papers on synthetic data generation for LLM training."
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["synthetic data", "data generation"]
+    minimum_total_papers: 3
+  synthesis_requirements:
+    must_address:
+      - "Distinguishes synthetic data for pretraining vs post-training"
+      - "Covers concerns about model collapse if relevant"
+    must_avoid: ["Fabrication"]
+    target_length_words: "800-1500"
+    expected_question_type: literature_review
+
+- id: 15
+  question: "What are the major papers on test-time compute and reasoning models?"
+  category: literature_review
+  retrieval_requirements:
+    type: topical
+    required_topics: ["test-time compute", "reasoning"]
+    minimum_total_papers: 3
+  synthesis_requirements:
+    must_address:
+      - "Covers OpenAI o1/o3 references if available"
+      - "Distinguishes training-time vs inference-time scaling"
+    must_avoid: ["Fabrication of o5 or similar"]
+    target_length_words: "800-1500"
+    expected_question_type: literature_review
+
+# =============================================================================
+# CATEGORY B: COMPARISON QUESTIONS (12 questions)
+# Tests: canonical-paper identification, structured extraction, balanced presentation
+# =============================================================================
+
+- id: 16
+  question: "Compare LoRA and QLoRA — when should I use each?"
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["LoRA", "QLoRA"]
+    minimum_papers_per_topic: 1
+  synthesis_requirements:
+    must_address:
+      - "Methodological difference between the two"
+      - "When to use each (memory tradeoffs)"
+      - "Performance/speed tradeoffs"
+    must_avoid:
+      - "Claiming one is universally better"
+      - "Fabrication"
+    target_length_words: "600-1200"
+    expected_question_type: comparison
+
+- id: 17
+  question: "Compare PPO-based RLHF and DPO."
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["RLHF", "DPO", "PPO"]
+    minimum_papers_per_topic: 1
+  synthesis_requirements:
+    must_address:
+      - "DPO eliminates separate reward model"
+      - "Simplicity vs flexibility tradeoff"
+      - "Empirical performance comparisons if available"
+    must_avoid: ["Fabrication"]
+    target_length_words: "600-1200"
+    expected_question_type: comparison
+
+- id: 18
+  question: "Compare AWQ and GPTQ for LLM quantization."
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["AWQ", "GPTQ"]
+    minimum_papers_per_topic: 1
+  synthesis_requirements:
+    must_address:
+      - "Methodological differences"
+      - "Performance comparisons"
+      - "Practical recommendations"
+    must_avoid: ["Fabrication"]
+    target_length_words: "600-1200"
+    expected_question_type: comparison
+
+- id: 19
+  question: "Compare ReAct and Reflexion as agent architectures."
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["ReAct", "Reflexion"]
+    minimum_papers_per_topic: 1
+  synthesis_requirements:
+    must_address:
+      - "ReAct = reasoning + acting interleaved"
+      - "Reflexion = self-reflection added to agent loops"
+      - "Reflexion builds on ReAct conceptually"
+    must_avoid: ["Treating as unrelated", "Fabrication"]
+    target_length_words: "600-1200"
+    expected_question_type: comparison
+
+- id: 20
+  question: "Compare FlashAttention and PagedAttention — what problem does each solve?"
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["FlashAttention", "PagedAttention"]
+    minimum_papers_per_topic: 1
+  synthesis_requirements:
+    must_address:
+      - "FlashAttention addresses I/O between HBM and SRAM during training/inference"
+      - "PagedAttention addresses KV cache memory fragmentation during serving"
+      - "Solving different problems, not direct alternatives"
+    must_avoid: ["Treating as direct alternatives", "Fabrication"]
+    target_length_words: "600-1200"
+    expected_question_type: comparison
+
+- id: 21
+  question: "Compare in-context learning and supervised fine-tuning for task adaptation."
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["in-context learning", "fine-tuning"]
+    minimum_papers_per_topic: 1
+  synthesis_requirements:
+    must_address:
+      - "When each approach is preferable"
+      - "Cost and flexibility tradeoffs"
+    must_avoid: ["Fabrication"]
+    target_length_words: "600-1200"
+    expected_question_type: comparison
+
+- id: 22
+  question: "Compare Constitutional AI and standard RLHF for alignment."
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["Constitutional AI", "RLHF"]
+    minimum_papers_per_topic: 1
+  synthesis_requirements:
+    must_address:
+      - "Constitutional AI uses AI feedback rather than only human"
+      - "Tradeoffs in scalability and oversight"
+    must_avoid: ["Fabrication"]
+    target_length_words: "600-1200"
+    expected_question_type: comparison
+
+- id: 23
+  question: "Compare retrieval methods: BM25 vs dense embeddings vs hybrid retrieval."
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["BM25", "dense retrieval", "hybrid retrieval"]
+    minimum_total_papers: 2
+  synthesis_requirements:
+    must_address:
+      - "BM25 is sparse/lexical, dense is semantic, hybrid combines both"
+      - "When each performs better"
+    must_avoid: ["Fabrication"]
+    target_length_words: "600-1200"
+    expected_question_type: comparison
+
+- id: 24
+  question: "Compare DPO, IPO, KTO, and ORPO as preference optimization methods."
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["DPO", "IPO", "KTO", "ORPO"]
+    minimum_papers_per_topic: 1
+  synthesis_requirements:
+    must_address:
+      - "Each method's distinct contribution"
+      - "Acknowledge fast-moving area; comparisons may be approximate"
+    must_avoid: ["Conflating methods", "Fabrication"]
+    target_length_words: "800-1500"
+    expected_question_type: comparison
+
+- id: 25
+  question: "Compare LangGraph, AutoGen, and CrewAI as agent frameworks."
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["LangGraph", "AutoGen", "CrewAI"]
+    minimum_total_papers: 0  # frameworks, not papers; agent should flag this
+  synthesis_requirements:
+    must_address:
+      - "Acknowledge these are frameworks/libraries, not academic papers"
+      - "Either decline or note that arXiv may have limited coverage"
+      - "If proceeding, focus on what each is designed for"
+    must_avoid:
+      - "Fabricating arxiv papers for framework documentation"
+      - "Pretending arxiv has authoritative coverage of these frameworks"
+    target_length_words: "400-800"
+    expected_question_type: comparison
+
+- id: 26
+  question: "Compare the safety approaches of Anthropic, OpenAI, and Google DeepMind."
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["AI safety", "alignment"]
+    minimum_total_papers: 2
+  synthesis_requirements:
+    must_address:
+      - "Acknowledge difficulty of comparing org-level approaches via arxiv alone"
+      - "Reference specific safety papers from each org if found"
+    must_avoid: ["Speculation about internal practices", "Fabrication"]
+    target_length_words: "800-1500"
+    expected_question_type: comparison
+
+- id: 27
+  question: "Compare different approaches to LLM-as-judge calibration."
+  category: comparison
+  retrieval_requirements:
+    type: topical
+    required_topics: ["LLM-as-judge", "evaluation"]
+    minimum_total_papers: 2
+  synthesis_requirements:
+    must_address:
+      - "Distinguishes calibration approaches (human-judge agreement, etc.)"
+      - "References specific papers (Zheng et al., Shankar et al. or similar)"
+    must_avoid: ["Fabrication"]
+    target_length_words: "600-1200"
+    expected_question_type: comparison
+
+# =============================================================================
+# CATEGORY C: SPECIFIC-RESULT LOOKUPS (12 questions)
+# Tests: retrieval precision, deep reading, honest decline behavior
+# =============================================================================
+
+- id: 28
+  question: "What was the parameter reduction reported in the original LoRA paper?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["LoRA"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "The reduction figure is reported as up to 10000x for GPT-3-scale models"
+      - "Cite the LoRA paper specifically"
+    must_avoid: ["Fabricated numbers", "Imprecise statements without citation"]
+    target_length_words: "100-400"
+    expected_question_type: specific_result
+
+- id: 29
+  question: "What benchmark accuracy did the InstructGPT paper report on TruthfulQA?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["InstructGPT"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "Specific number from the paper if found"
+      - "If exact number not found, honest 'reported improvement on TruthfulQA but specific number not surfaced'"
+    must_avoid: ["Fabricated benchmark numbers"]
+    target_length_words: "100-400"
+    expected_question_type: specific_result
+
+- id: 30
+  question: "How much speedup did the original speculative decoding paper claim?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["speculative decoding"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "Speedup numbers reported (typically 2-3x)"
+      - "Cite source"
+    must_avoid: ["Fabrication"]
+    target_length_words: "100-400"
+    expected_question_type: specific_result
+
+- id: 31
+  question: "What context length did the original Llama 2 paper support?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["Llama 2"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "4096 tokens"
+      - "Cite the Llama 2 paper"
+    must_avoid: ["Confusing with Llama 3 numbers", "Fabrication"]
+    target_length_words: "100-300"
+    expected_question_type: specific_result
+
+- id: 32
+  question: "What was the size of the dataset used in the Constitutional AI paper?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["Constitutional AI"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "Specific dataset details from the paper"
+      - "If exact number not surfaced, honest acknowledgement"
+    must_avoid: ["Fabrication"]
+    target_length_words: "100-400"
+    expected_question_type: specific_result
+
+- id: 33
+  question: "What hyperparameters did the QLoRA paper recommend for 7B models?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["QLoRA"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "Specific hyperparameter values from the paper"
+      - "Cite the source section"
+    must_avoid: ["Fabrication"]
+    target_length_words: "200-500"
+    expected_question_type: specific_result
+
+- id: 34
+  question: "In the FlashAttention paper, what was the speedup over standard attention?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["FlashAttention"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "Specific speedup numbers from the paper"
+      - "Note conditions (sequence length, etc.)"
+    must_avoid: ["Fabrication"]
+    target_length_words: "200-500"
+    expected_question_type: specific_result
+
+- id: 35
+  question: "What did the Sleeper Agents paper find about safety training's effect on backdoors?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["sleeper agents", "backdoor"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "Safety training did not remove backdoor behaviors"
+      - "Cite the paper"
+    must_avoid: ["Fabrication"]
+    target_length_words: "200-500"
+    expected_question_type: specific_result
+
+- id: 36
+  question: "What did the Lost in the Middle paper measure about position bias?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["Lost in the Middle", "long context"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "Models pay less attention to information in the middle of long contexts"
+      - "Reference specific experimental setup"
+    must_avoid: ["Fabrication"]
+    target_length_words: "200-500"
+    expected_question_type: specific_result
+
+- id: 37
+  question: "Has anyone published on how speculative decoding latency changes when the draft model is more than 10x smaller than the target?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["speculative decoding"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "Acknowledge this specific dimension may not be directly studied"
+      - "Reference adjacent work on draft model size if found"
+      - "Honest 'I couldn't find a paper directly addressing this' if applicable"
+    must_avoid: ["Fabricating a specific finding", "Overstating coverage"]
+    target_length_words: "200-600"
+    expected_question_type: specific_result
+
+- id: 38
+  question: "What's the empirical relationship between LoRA rank and downstream task accuracy across different domains?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["LoRA"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "Acknowledge this is studied in various papers but consensus may be limited"
+      - "Reference what's reported in the original LoRA paper"
+      - "Honest about scope of evidence"
+    must_avoid: ["Overgeneralized claims", "Fabrication"]
+    target_length_words: "300-700"
+    expected_question_type: specific_result
+
+- id: 39
+  question: "Has anyone measured how RLHF affects model calibration on out-of-distribution inputs?"
+  category: specific_result
+  retrieval_requirements:
+    type: topical
+    required_topics: ["RLHF", "calibration"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "Reference papers on RLHF and calibration if found"
+      - "Honest if specific OOD calibration question not directly addressed"
+    must_avoid: ["Fabricating findings"]
+    target_length_words: "300-700"
+    expected_question_type: specific_result
+
+# =============================================================================
+# CATEGORY D: EXPLAIN-A-PAPER (8 questions)
+# Tests: single-paper deep reading, accurate summarization, audience-appropriate explanation
+# Note: user provides arxiv_id, so retrieval is deterministic (just fetch the given paper)
+# =============================================================================
+
+- id: 40
+  question: "Explain the key contribution of the InstructGPT paper (arxiv:2203.02155)."
+  category: explain_paper
+  retrieval_requirements:
+    type: specific_paper
+    required_paper: "2203.02155"
+  synthesis_requirements:
+    must_address:
+      - "The three-stage pipeline: SFT then reward model then PPO"
+      - "Use of human preference data"
+      - "Why this matters for instruction-following"
+    must_avoid:
+      - "Hallucinating details not in the paper"
+      - "Confusing with later work"
+    target_length_words: "400-800"
+    expected_question_type: explain_paper
+
+- id: 41
+  question: "Explain the LoRA paper (arxiv:2106.09685) at the level of someone who knows transformers but not adapters."
+  category: explain_paper
+  retrieval_requirements:
+    type: specific_paper
+    required_paper: "2106.09685"
+  synthesis_requirements:
+    must_address:
+      - "Low-rank decomposition matrices injected into transformer layers"
+      - "Base weights frozen during training"
+      - "Parameter efficiency claims"
+      - "Audience-appropriate (assumes transformer knowledge, explains adapter concept)"
+    must_avoid: ["Hallucination", "Audience mismatch"]
+    target_length_words: "500-1000"
+    expected_question_type: explain_paper
+
+- id: 42
+  question: "Explain the Constitutional AI paper (arxiv:2212.08073) — what's the core idea and why does it matter?"
+  category: explain_paper
+  retrieval_requirements:
+    type: specific_paper
+    required_paper: "2212.08073"
+  synthesis_requirements:
+    must_address:
+      - "Use of AI feedback to replace some human feedback"
+      - "Constitution as a set of principles"
+      - "Two-phase: SL with self-critique, then RL with AI feedback"
+    must_avoid: ["Hallucination"]
+    target_length_words: "500-1000"
+    expected_question_type: explain_paper
+
+- id: 43
+  question: "Explain DPO (arxiv:2305.18290) — why is it equivalent to RLHF, conceptually?"
+  category: explain_paper
+  retrieval_requirements:
+    type: specific_paper
+    required_paper: "2305.18290"
+  synthesis_requirements:
+    must_address:
+      - "DPO derives a closed-form expression that bypasses reward modeling"
+      - "The mathematical equivalence to RLHF objective"
+      - "Practical implication: no separate reward model needed"
+    must_avoid: ["Hallucinating mathematical details"]
+    target_length_words: "500-1000"
+    expected_question_type: explain_paper
+
+- id: 44
+  question: "Explain the FlashAttention paper (arxiv:2205.14135) at a high level — what's the I/O insight?"
+  category: explain_paper
+  retrieval_requirements:
+    type: specific_paper
+    required_paper: "2205.14135"
+  synthesis_requirements:
+    must_address:
+      - "Memory hierarchy: HBM (slow, large) vs SRAM (fast, small)"
+      - "Standard attention is bottlenecked by HBM access"
+      - "FlashAttention tiles to keep computation in SRAM"
+    must_avoid: ["Hallucination"]
+    target_length_words: "500-1000"
+    expected_question_type: explain_paper
+
+- id: 45
+  question: "Explain ReAct (arxiv:2210.03629) — what was the contribution before agents were everywhere?"
+  category: explain_paper
+  retrieval_requirements:
+    type: specific_paper
+    required_paper: "2210.03629"
+  synthesis_requirements:
+    must_address:
+      - "Interleaving Reasoning steps with Acting (tool use)"
+      - "Improvement over CoT alone or pure action sequences"
+    must_avoid: ["Hallucination", "Anachronism"]
+    target_length_words: "400-800"
+    expected_question_type: explain_paper
+
+- id: 46
+  question: "Explain Lost in the Middle (arxiv:2307.03172) — what's the experimental setup and finding?"
+  category: explain_paper
+  retrieval_requirements:
+    type: specific_paper
+    required_paper: "2307.03172"
+  synthesis_requirements:
+    must_address:
+      - "Experimental setup: documents placed at varying positions"
+      - "Finding: models perform worse when relevant info is in the middle"
+      - "Implications for RAG and prompt engineering"
+    must_avoid: ["Hallucination"]
+    target_length_words: "400-800"
+    expected_question_type: explain_paper
+
+- id: 47
+  question: "Explain the Sleeper Agents paper (arxiv:2401.05566) — what threat model is it demonstrating?"
+  category: explain_paper
+  retrieval_requirements:
+    type: specific_paper
+    required_paper: "2401.05566"
+  synthesis_requirements:
+    must_address:
+      - "Threat model: deceptive behavior triggered by specific conditions"
+      - "Finding: standard safety training does not remove the deceptive behavior"
+      - "Implications for trust in safety-trained models"
+    must_avoid: ["Hallucination", "Overstatement of findings"]
+    target_length_words: "500-1000"
+    expected_question_type: explain_paper
+
+# =============================================================================
+# CATEGORY E: TRAP QUESTIONS (8 questions)
+# Tests: honest decline behavior; the most important behavior in the system
+# =============================================================================
+
+- id: 48
+  question: "What did the OpenAI o5 paper say about scaling?"
+  category: trap
+  retrieval_requirements:
+    type: none
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "After searching, I could not find a paper introducing 'OpenAI o5'. We don't support answering this at this time. (You may be thinking of o1 or o3.)"
+
+- id: 49
+  question: "Summarize the 2024 Anthropic paper on agentic memory architectures."
+  category: trap
+  retrieval_requirements:
+    type: none
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "After searching, I could not find a 2024 Anthropic paper on agentic memory architectures. We don't support answering this at this time."
+
+- id: 50
+  question: "What did the recent paper from Google DeepMind on 'Recursive Self-Reflection in Language Agents' propose?"
+  category: trap
+  retrieval_requirements:
+    type: none
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "After searching, I could not find a paper with this exact title from Google DeepMind. We don't support answering this at this time."
+
+- id: 51
+  question: "What's the best open-source LLM for production use right now?"
+  category: trap
+  retrieval_requirements:
+    type: none
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "This is a subjective recommendation question rather than a research question I can answer from arXiv. We don't support answering this at this time."
+
+- id: 52
+  question: "Which fine-tuning approach should I use for my project?"
+  category: trap
+  retrieval_requirements:
+    type: none
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "Answering this requires context about your project that I don't have. We don't support answering this at this time. (If you provide details — task, model size, compute budget — I can suggest relevant literature.)"
+
+- id: 53
+  question: "How do I implement a transformer in PyTorch?"
+  category: trap
+  retrieval_requirements:
+    type: none
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "This is an engineering implementation question, not a research question. We don't support answering this at this time."
+
+- id: 54
+  question: "What's the best way to set up a vector database for production?"
+  category: trap
+  retrieval_requirements:
+    type: none
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "This is an engineering question rather than a research question I can answer from arXiv. We don't support answering this at this time."
+
+- id: 55
+  question: "Why does RLHF make models worse at math?"
+  category: trap
+  retrieval_requirements:
+    type: topical
+    required_topics: ["RLHF"]
+    minimum_total_papers: 1
+  synthesis_requirements:
+    must_address:
+      - "Premise is contested, not established"
+      - "There is research suggesting tradeoffs but not a settled finding"
+      - "Reference adjacent work without endorsing the premise"
+    must_avoid: ["Accepting the loaded premise as fact"]
+    target_length_words: "300-700"
+    expected_question_type: specific_result
+
+# =============================================================================
+# CATEGORY F: EDGE CASES (5 questions)
+# Tests: input validation, graceful handling of degenerate cases
+# =============================================================================
+
+- id: 56
+  question: "hi"
+  category: edge_case
+  retrieval_requirements:
+    type: none
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "This isn't a research question. Please provide a specific question about ML/AI papers you'd like me to answer."
+
+- id: 57
+  question: "Tell me everything about LLMs."
+  category: edge_case
+  retrieval_requirements:
+    type: none
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "This question is too broad to answer meaningfully. Please narrow to a specific aspect — pretraining, fine-tuning, evaluation, etc."
+
+- id: 58
+  question: "What does paper arxiv:9999.99999 say about transformers?"
+  category: edge_case
+  retrieval_requirements:
+    type: specific_paper
+    required_paper: "9999.99999"
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "The arxiv ID 9999.99999 does not appear to be valid. We don't support answering this at this time."
+
+- id: 59
+  question: "Compare the methods in [empty input]."
+  category: edge_case
+  retrieval_requirements:
+    type: none
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "The question appears malformed (empty placeholder). Please provide specific methods to compare."
+
+- id: 60
+  question: "What did Hinton's 2022 paper on capsule networks for LLMs say?"
+  category: edge_case
+  retrieval_requirements:
+    type: none
+  synthesis_requirements:
+    expected_question_type: cannot_answer
+  refusal_requirements:
+    should_refuse: true
+    refusal_reason: "I could not verify a Hinton 2022 paper specifically on capsule networks for LLMs. Capsule networks are real but Hinton's work in this area predates LLMs. We don't support answering this at this time."
