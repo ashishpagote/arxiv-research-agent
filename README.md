@@ -57,7 +57,8 @@ cp .env.example .env
 - [x] Output schema locked
 - [x] Repo setup
 - [x] Tools implemented (33 tests passing)
-- [ ] Agent built
+- [x] Agent built (single-agent YOLO loop, Langfuse-traced)
+- [x] CLI entry point (`uv run arxiv-agent "..."`)
 - [ ] Eval harness
 - [ ] Ablations + writeup
 
