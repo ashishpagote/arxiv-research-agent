@@ -56,7 +56,7 @@ cp .env.example .env
 - [x] Architecture: single agent, YOLO loop
 - [x] Output schema locked
 - [x] Repo setup
-- [ ] Tools implemented
+- [x] Tools implemented (33 tests passing)
 - [ ] Agent built
 - [ ] Eval harness
 - [ ] Ablations + writeup
