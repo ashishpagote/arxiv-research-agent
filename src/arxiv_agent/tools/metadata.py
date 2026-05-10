@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import sys
 from datetime import date
 
 import arxiv
@@ -96,9 +97,19 @@ def verify_arxiv_id(arxiv_id: str) -> VerifyResult:
     # Cache: if we've seen this ID before, return the cached answer.
     cached = cache_get_json("verify", cleaned)
     if cached is not None:
+        print(
+            f"[verify_arxiv_id] Cache hit for {cleaned}",
+            file=sys.stderr,
+            flush=True,
+        )
         return VerifyResult.model_validate(cached)
 
     # API call.
+    print(
+        f"[verify_arxiv_id] Querying arXiv for ID: {cleaned}",
+        file=sys.stderr,
+        flush=True,
+    )
     try:
         client = get_client()
         search = arxiv.Search(id_list=[cleaned])
@@ -146,8 +157,18 @@ def get_paper_metadata(arxiv_id: str) -> MetadataResult:
 
     cached = cache_get_json("metadata", cleaned)
     if cached is not None:
+        print(
+            f"[get_paper_metadata] Cache hit for {cleaned}",
+            file=sys.stderr,
+            flush=True,
+        )
         return MetadataResult.model_validate(cached)
 
+    print(
+        f"[get_paper_metadata] Fetching metadata for: {cleaned}",
+        file=sys.stderr,
+        flush=True,
+    )
     try:
         client = get_client()
         search = arxiv.Search(id_list=[cleaned])
