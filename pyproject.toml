@@ -7,6 +7,7 @@ requires-python = ">=3.11"
 dependencies = [
     "anthropic>=0.100.0",
     "arxiv>=3.0.0",
+    "langchain>=1.2.18",
     "langchain-anthropic>=1.4.3",
     "langfuse>=4.5.1",
     "langgraph>=1.1.10",
@@ -19,7 +20,7 @@ dependencies = [
 ]
 
 [project.scripts]
-arxiv-agent = "arxiv_agent:main"
+arxiv-agent = "arxiv_agent.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.11.11,<0.12.0"]

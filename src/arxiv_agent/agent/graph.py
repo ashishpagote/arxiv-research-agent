@@ -250,6 +250,8 @@ def run_agent(question: str) -> AgentAnswer:
     Returns:
         A validated AgentAnswer.
     """
+    from arxiv_agent.agent.tracing import flush, get_callback_handler
+
     graph = get_graph()
 
     initial_state: AgentState = {
@@ -260,10 +262,23 @@ def run_agent(question: str) -> AgentAnswer:
         "iterations": 0,
     }
 
-    final_state = graph.invoke(
-        initial_state,
-        config={"recursion_limit": MAX_AGENT_ITERATIONS * 3},
-    )
+    config: dict = {"recursion_limit": MAX_AGENT_ITERATIONS * 3}
+
+    handler = get_callback_handler()
+    if handler is not None:
+        config["callbacks"] = [handler]
+        # Tag traces so they're easy to find in the Langfuse UI
+        config["metadata"] = {
+            "agent": "arxiv-research-agent",
+            "version": "v1",
+        }
+        config["tags"] = ["arxiv-agent", "v1"]
+        config["run_name"] = f"arxiv-agent: {question[:60]}"
+
+    try:
+        final_state = graph.invoke(initial_state, config=config)
+    finally:
+        flush()  # ensure traces get sent even if invoke raises
 
     raw_answer = _extract_final_answer(final_state["messages"])
     return _parse_agent_answer(
