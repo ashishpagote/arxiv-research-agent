@@ -25,7 +25,7 @@ JUDGE_MODEL: str = os.getenv("JUDGE_MODEL", "claude-opus-4-7")
 
 
 # === Behavior ===
-MAX_AGENT_ITERATIONS: int = int(os.getenv("MAX_AGENT_ITERATIONS", "10"))
+MAX_AGENT_ITERATIONS: int = int(os.getenv("MAX_AGENT_ITERATIONS", "7"))
 MAX_PAPERS_PER_SEARCH: int = int(os.getenv("MAX_PAPERS_PER_SEARCH", "10"))
 
 
