@@ -47,45 +47,7 @@ def answer_path(run_name: str, question_id: int) -> Path:
 
 def metadata_path(run_name: str) -> Path:
     return run_dir(run_name) / "run_metadata.json"
-# ---------------------------------------------------------------------------
-# Retry helper
-# ---------------------------------------------------------------------------
 
-DEFAULT_MAX_RETRIES = 5
-DEFAULT_BASE_WAIT = 15.0  # seconds
-
-
-def _retry_run_agent(
-    question_text: str,
-    *,
-    max_retries: int = DEFAULT_MAX_RETRIES,
-    base_wait: float = DEFAULT_BASE_WAIT,
-):
-    """Run the agent, retrying on rate-limit errors with exponential backoff.
-
-    On rate-limit errors, wait base_wait * 2^attempt seconds, up to a cap.
-    Other errors propagate immediately.
-    """
-    for attempt in range(max_retries):
-        try:
-            return run_agent(question_text)
-        except (RateLimitError, APIStatusError) as exc:
-            # Only retry on 429 specifically
-            status_code = getattr(exc, "status_code", None)
-            if status_code != 429 and not isinstance(exc, RateLimitError):
-                raise
-            wait = min(base_wait * (2**attempt), 120.0)
-            print(
-                f"[runner] Rate limited (attempt {attempt + 1}/{max_retries}); "
-                f"waiting {wait:.0f}s before retry",
-                file=sys.stderr,
-                flush=True,
-            )
-            time.sleep(wait)
-    # If we exhaust retries, raise the final error
-    raise RuntimeError(
-        f"Exhausted {max_retries} retries on rate-limit errors"
-    )
 
 # ---------------------------------------------------------------------------
 # Saving and loading answers
@@ -200,7 +162,7 @@ def run_eval(
 
             t0 = time.time()
             try:
-                answer = _retry_run_agent(question.question)
+                answer = run_agent(question.question)
                 elapsed = time.time() - t0
                 save_answer(
                     run_name,

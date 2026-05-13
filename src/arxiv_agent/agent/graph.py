@@ -3,8 +3,10 @@ from __future__ import annotations
 
 import json
 import sys
+import time
 from typing import Annotated, TypedDict
 
+from anthropic import APIStatusError, RateLimitError
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import (
     AIMessage,
@@ -275,8 +277,32 @@ def run_agent(question: str) -> AgentAnswer:
         config["tags"] = ["arxiv-agent", "v1"]
         config["run_name"] = f"arxiv-agent: {question[:60]}"
 
+    max_retries = 5
+    base_wait = 15.0
+    last_exc = None
     try:
-        final_state = graph.invoke(initial_state, config=config)
+        for attempt in range(max_retries):
+            try:
+                final_state = graph.invoke(initial_state, config=config)
+                break
+            except (RateLimitError, APIStatusError) as exc:
+                status_code = getattr(exc, "status_code", None)
+                if status_code != 429 and not isinstance(exc, RateLimitError):
+                    raise
+                last_exc = exc
+                wait = min(base_wait * (2**attempt), 120.0)
+                print(
+                    f"[agent] Rate limited (attempt {attempt + 1}/{max_retries}); "
+                    f"waiting {wait:.0f}s before retry",
+                    file=sys.stderr,
+                    flush=True,
+                )
+                time.sleep(wait)
+        else:
+            # Exhausted all retries
+            raise RuntimeError(
+                f"Exhausted {max_retries} retries on rate-limit errors"
+            ) from last_exc
     finally:
         flush()  # ensure traces get sent even if invoke raises
 
