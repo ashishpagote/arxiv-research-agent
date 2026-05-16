@@ -1,0 +1,25 @@
+{
+  "question_id": 56,
+  "category": "edge_case",
+  "agent_question_type": "cannot_answer",
+  "agent_confidence": "high",
+  "iterations_used": 1,
+  "is_exception": false,
+  "is_unparseable": false,
+  "retrieval": {
+    "question_id": 56,
+    "retrieval_type": "none",
+    "skipped": true,
+    "passed": true,
+    "topics": [],
+    "required_paper_check": null,
+    "notes": "No retrieval required for this question."
+  },
+  "refusal": {
+    "question_id": 56,
+    "should_refuse": true,
+    "actually_refused": true,
+    "passed": true,
+    "failure_mode": null
+  }
+}

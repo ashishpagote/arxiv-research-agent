@@ -1,0 +1,29 @@
+{
+  "question_id": 58,
+  "category": "edge_case",
+  "agent_question_type": "cannot_answer",
+  "agent_confidence": "high",
+  "iterations_used": 2,
+  "is_exception": false,
+  "is_unparseable": false,
+  "retrieval": {
+    "question_id": 58,
+    "retrieval_type": "specific_paper",
+    "skipped": false,
+    "passed": false,
+    "topics": [],
+    "required_paper_check": {
+      "required_paper": "9999.99999",
+      "found": false,
+      "papers_consulted": []
+    },
+    "notes": "Required paper 9999.99999 not in papers_consulted."
+  },
+  "refusal": {
+    "question_id": 58,
+    "should_refuse": true,
+    "actually_refused": true,
+    "passed": true,
+    "failure_mode": null
+  }
+}
