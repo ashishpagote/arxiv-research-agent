@@ -1,4 +1,5 @@
 """Shared arXiv client with proper rate limiting."""
+
 from __future__ import annotations
 
 import arxiv

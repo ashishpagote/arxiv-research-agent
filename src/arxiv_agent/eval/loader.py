@@ -1,4 +1,5 @@
 """Load and validate the golden evaluation dataset."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -8,7 +9,6 @@ import yaml
 from pydantic import BaseModel, Field, model_validator
 
 from arxiv_agent.config import PROJECT_ROOT
-
 
 # ---------------------------------------------------------------------------
 # Schemas
@@ -44,7 +44,7 @@ class RetrievalRequirements(BaseModel):
     required_paper: str | None = None
 
     @model_validator(mode="after")
-    def check_consistency(self) -> "RetrievalRequirements":
+    def check_consistency(self) -> RetrievalRequirements:
         if self.type == "specific_paper" and not self.required_paper:
             raise ValueError(
                 "retrieval_requirements.type='specific_paper' requires 'required_paper'."
@@ -126,7 +126,8 @@ def load_dataset(path: Path | str | None = None) -> list[EvalQuestion]:
 
     if errors:
         raise ValueError(
-            "Dataset validation failed:\n" + "\n".join(errors[:10])
+            "Dataset validation failed:\n"
+            + "\n".join(errors[:10])
             + ("\n... (truncated)" if len(errors) > 10 else "")
         )
 

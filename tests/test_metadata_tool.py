@@ -1,14 +1,15 @@
 """Tests for the metadata tools."""
+
 from arxiv_agent.tools.metadata import (
     get_paper_metadata,
     is_valid_arxiv_id_format,
     verify_arxiv_id,
 )
 
-
 # ---------------------------------------------------------------------------
 # Format validation (no network calls)
 # ---------------------------------------------------------------------------
+
 
 class TestArxivIdFormat:
     def test_valid_new_style(self):
@@ -37,6 +38,7 @@ class TestArxivIdFormat:
 # ---------------------------------------------------------------------------
 # verify_arxiv_id (network calls, but cached after first run)
 # ---------------------------------------------------------------------------
+
 
 class TestVerifyArxivId:
     def test_real_paper_exists(self):
@@ -67,6 +69,7 @@ class TestVerifyArxivId:
 # ---------------------------------------------------------------------------
 # get_paper_metadata
 # ---------------------------------------------------------------------------
+
 
 class TestGetPaperMetadata:
     def test_real_paper_full_metadata(self):

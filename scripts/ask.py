@@ -3,11 +3,12 @@
 Usage:
     uv run python scripts/ask.py "Compare LoRA and QLoRA"
 """
+
 import sys
 
 from rich.console import Console
-from rich.panel import Panel
 from rich.markdown import Markdown
+from rich.panel import Panel
 
 from arxiv_agent.agent.graph import run_agent
 
@@ -26,13 +27,15 @@ def main():
 
     # Header
     console.print()
-    console.print(Panel.fit(
-        f"[bold]Type:[/bold] {answer.question_type}    "
-        f"[bold]Confidence:[/bold] {answer.confidence}    "
-        f"[bold]Iterations:[/bold] {answer.iterations_used}    "
-        f"[bold]Papers:[/bold] {len(answer.papers_consulted)}",
-        border_style="green",
-    ))
+    console.print(
+        Panel.fit(
+            f"[bold]Type:[/bold] {answer.question_type}    "
+            f"[bold]Confidence:[/bold] {answer.confidence}    "
+            f"[bold]Iterations:[/bold] {answer.iterations_used}    "
+            f"[bold]Papers:[/bold] {len(answer.papers_consulted)}",
+            border_style="green",
+        )
+    )
 
     # Answer body
     console.print()

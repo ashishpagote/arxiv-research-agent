@@ -1,4 +1,5 @@
 """Simple file-based cache for arXiv API responses and PDFs."""
+
 from __future__ import annotations
 
 import hashlib

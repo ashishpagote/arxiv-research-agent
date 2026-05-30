@@ -1,13 +1,13 @@
 """Pydantic schemas for tool inputs and outputs."""
+
 from __future__ import annotations
 
 from datetime import date
-from typing import Literal
 
 from pydantic import BaseModel, Field
 
-
 # === Paper representations ===
+
 
 class PaperMetadata(BaseModel):
     """Lightweight paper metadata, returned by search and metadata tools."""
@@ -24,6 +24,7 @@ class PaperMetadata(BaseModel):
 
 
 # === Tool result wrappers ===
+
 
 class ToolResult(BaseModel):
     """Base class for tool results. Each tool returns success or error info."""

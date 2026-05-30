@@ -7,6 +7,7 @@ Examples:
     uv run python scripts/run_eval.py v1_first_pass 20
     uv run python scripts/run_eval.py v1_full
 """
+
 from __future__ import annotations
 
 import sys
@@ -17,7 +18,7 @@ from arxiv_agent.eval.runner import run_eval
 
 def main():
     if len(sys.argv) < 2:
-        print('Usage: uv run python scripts/run_eval.py <run_name> [n_questions]')
+        print("Usage: uv run python scripts/run_eval.py <run_name> [n_questions]")
         sys.exit(1)
 
     run_name = sys.argv[1]

@@ -1,4 +1,5 @@
 """Search tool for finding papers on arXiv."""
+
 from __future__ import annotations
 
 import json
@@ -11,10 +12,10 @@ from arxiv_agent.tools.cache import cache_get_json, cache_set_json
 from arxiv_agent.tools.metadata import _to_metadata
 from arxiv_agent.tools.schemas import PaperMetadata, SearchResult
 
-
 # ---------------------------------------------------------------------------
 # Query helpers
 # ---------------------------------------------------------------------------
+
 
 def _build_query(query: str, year_range: tuple[int, int] | None) -> str:
     """Combine the user's query with an optional year range filter.
@@ -33,12 +34,8 @@ def _build_query(query: str, year_range: tuple[int, int] | None) -> str:
 
     start_year, end_year = year_range
     if start_year > end_year:
-        raise ValueError(
-            f"Invalid year range: start {start_year} > end {end_year}"
-        )
-    date_filter = (
-        f"submittedDate:[{start_year}01010000 TO {end_year}12312359]"
-    )
+        raise ValueError(f"Invalid year range: start {start_year} > end {end_year}")
+    date_filter = f"submittedDate:[{start_year}01010000 TO {end_year}12312359]"
     return f"{base} AND {date_filter}"
 
 
@@ -55,6 +52,7 @@ def _cache_key(query: str, max_results: int, year_range: tuple[int, int] | None)
 # ---------------------------------------------------------------------------
 # Public tool function
 # ---------------------------------------------------------------------------
+
 
 def search_arxiv(
     query: str,
@@ -137,10 +135,7 @@ def search_arxiv(
     # do a strict client-side filter to honor our tool's contract.
     if year_range is not None:
         start_year, end_year = year_range
-        papers = [
-            p for p in papers
-            if start_year <= p.published_date.year <= end_year
-        ]
+        papers = [p for p in papers if start_year <= p.published_date.year <= end_year]
     result = SearchResult(
         success=True,
         query=query,

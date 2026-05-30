@@ -3,6 +3,7 @@
 For each question, checks whether the agent retrieved the papers it
 should have. Uses substring matching against paper titles + abstracts.
 """
+
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
@@ -10,10 +11,10 @@ from pydantic import BaseModel, Field
 from arxiv_agent.eval.loader import EvalQuestion
 from arxiv_agent.tools.metadata import get_paper_metadata
 
-
 # ---------------------------------------------------------------------------
 # Score schema
 # ---------------------------------------------------------------------------
+
 
 class TopicCheck(BaseModel):
     """Per-topic retrieval check result."""
@@ -38,6 +39,7 @@ class RetrievalScore(BaseModel):
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _build_searchable_text(arxiv_ids: list[str]) -> dict[str, str]:
     """For each arxiv_id, return its title+abstract as one lowercase string.
@@ -70,6 +72,7 @@ def _check_topic(topic: str, text_by_id: dict[str, str]) -> TopicCheck:
 # ---------------------------------------------------------------------------
 # Public scorer
 # ---------------------------------------------------------------------------
+
 
 def score_retrieval(
     question: EvalQuestion,
@@ -109,7 +112,9 @@ def score_retrieval(
                 "found": found,
                 "papers_consulted": papers_consulted,
             },
-            notes=None if found else f"Required paper {required} not in papers_consulted.",
+            notes=(
+                None if found else f"Required paper {required} not in papers_consulted."
+            ),
         )
 
     # Type 'topical': check that each required topic is covered.

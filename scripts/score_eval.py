@@ -3,7 +3,9 @@
 Usage:
     uv run python scripts/score_eval.py <run_name>
 """
+
 import sys
+
 from arxiv_agent.eval.scorer_runner import score_run
 
 

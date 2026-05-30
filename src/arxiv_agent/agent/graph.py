@@ -1,4 +1,5 @@
 """LangGraph state machine for the arXiv research agent."""
+
 from __future__ import annotations
 
 import json
@@ -11,13 +12,13 @@ from langchain_core.messages import (
     AnyMessage,
     HumanMessage,
     SystemMessage,
-    ToolMessage,
 )
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 
 from arxiv_agent.agent.prompts import get_system_prompt
+from arxiv_agent.agent.retry import with_llm_retry
 from arxiv_agent.agent.schemas import AgentAnswer
 from arxiv_agent.agent.tools import ALL_TOOLS
 from arxiv_agent.config import (
@@ -26,10 +27,10 @@ from arxiv_agent.config import (
     PRIMARY_MODEL,
 )
 
-
 # ---------------------------------------------------------------------------
 # State
 # ---------------------------------------------------------------------------
+
 
 class AgentState(TypedDict):
     """The state passed through the graph.
@@ -46,6 +47,7 @@ class AgentState(TypedDict):
 # LLM setup
 # ---------------------------------------------------------------------------
 
+
 def _build_llm():
     """Build the Anthropic LLM client bound to our tools."""
     llm = ChatAnthropic(
@@ -61,6 +63,7 @@ def _build_llm():
 # Nodes
 # ---------------------------------------------------------------------------
 
+
 def agent_node(state: AgentState) -> dict:
     """Call the LLM with the current message history.
 
@@ -69,7 +72,7 @@ def agent_node(state: AgentState) -> dict:
       - Returns one or more tool calls → graph routes to tool node
     """
     llm = _build_llm()
-    response = llm.invoke(state["messages"])
+    response = with_llm_retry(llm.invoke)(state["messages"])
 
     # Print a brief status to stderr so the user sees progress
     if response.tool_calls:
@@ -101,6 +104,7 @@ tool_node = ToolNode(ALL_TOOLS)
 # Routing
 # ---------------------------------------------------------------------------
 
+
 def should_continue(state: AgentState) -> str:
     """Decide whether to call tools or end.
 
@@ -128,6 +132,7 @@ def should_continue(state: AgentState) -> str:
 # Graph construction
 # ---------------------------------------------------------------------------
 
+
 def build_graph():
     """Assemble the agent's state machine."""
     graph = StateGraph(AgentState)
@@ -148,6 +153,7 @@ def build_graph():
 # ---------------------------------------------------------------------------
 # Public runner
 # ---------------------------------------------------------------------------
+
 
 def _extract_final_answer(messages: list[AnyMessage]) -> str:
     """Grab the last AI message's text content."""
@@ -228,6 +234,7 @@ def _parse_agent_answer(raw_text: str, question: str, iterations: int) -> AgentA
         confidence_reason="Output did not match the required schema.",
         iterations_used=iterations,
     )
+
 
 # Cache the compiled graph since rebuilding it is expensive
 _compiled_graph = None

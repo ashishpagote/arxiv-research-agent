@@ -1,4 +1,5 @@
 """Tools for fetching paper metadata and verifying arXiv IDs."""
+
 from __future__ import annotations
 
 import re
@@ -14,7 +15,6 @@ from arxiv_agent.tools.schemas import (
     PaperMetadata,
     VerifyResult,
 )
-
 
 # ---------------------------------------------------------------------------
 # arXiv ID validation
@@ -44,13 +44,14 @@ def _normalize_arxiv_id(arxiv_id: str) -> str:
     """Strip whitespace and a leading 'arxiv:' prefix if present."""
     cleaned = arxiv_id.strip()
     if cleaned.lower().startswith("arxiv:"):
-        cleaned = cleaned[len("arxiv:"):].strip()
+        cleaned = cleaned[len("arxiv:") :].strip()
     return cleaned
 
 
 # ---------------------------------------------------------------------------
 # Paper metadata extraction
 # ---------------------------------------------------------------------------
+
 
 def _to_metadata(paper: arxiv.Result) -> PaperMetadata:
     """Convert an arxiv.Result into our PaperMetadata schema."""
@@ -72,6 +73,7 @@ def _to_metadata(paper: arxiv.Result) -> PaperMetadata:
 # ---------------------------------------------------------------------------
 # Public tool functions
 # ---------------------------------------------------------------------------
+
 
 def verify_arxiv_id(arxiv_id: str) -> VerifyResult:
     """Check whether an arXiv ID exists.

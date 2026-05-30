@@ -6,16 +6,17 @@ check whether the agent's question_type is 'cannot_answer'.
 Also catches false refusals: when the agent refuses a question it
 should have answered (e.g. a real lit review request).
 """
+
 from __future__ import annotations
 
 from pydantic import BaseModel
 
 from arxiv_agent.eval.loader import EvalQuestion
 
-
 # ---------------------------------------------------------------------------
 # Score schema
 # ---------------------------------------------------------------------------
+
 
 class RefusalScore(BaseModel):
     """Result of the refusal check for one question."""
@@ -30,6 +31,7 @@ class RefusalScore(BaseModel):
 # ---------------------------------------------------------------------------
 # Public scorer
 # ---------------------------------------------------------------------------
+
 
 def score_refusal(
     question: EvalQuestion,

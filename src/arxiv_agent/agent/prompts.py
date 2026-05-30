@@ -1,4 +1,5 @@
 """System prompts for the arXiv research agent."""
+
 from __future__ import annotations
 
 SYSTEM_PROMPT = """You are a research agent that answers questions about ML/AI papers on arXiv.

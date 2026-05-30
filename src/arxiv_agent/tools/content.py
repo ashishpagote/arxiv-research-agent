@@ -1,4 +1,5 @@
 """Tool for fetching the full text of arXiv papers."""
+
 from __future__ import annotations
 
 import sys
@@ -19,10 +20,10 @@ from arxiv_agent.tools.metadata import (
 )
 from arxiv_agent.tools.schemas import FullTextResult
 
-
 # ---------------------------------------------------------------------------
 # PDF download + parsing
 # ---------------------------------------------------------------------------
+
 
 def _download_pdf(arxiv_id: str, pdf_url: str) -> bytes | None:
     """Download a PDF, using the byte-cache when possible."""
@@ -88,6 +89,7 @@ def _extract_text(pdf_bytes: bytes) -> tuple[str, int]:
 # Public tool function
 # ---------------------------------------------------------------------------
 
+
 def get_paper_full_text(arxiv_id: str) -> FullTextResult:
     """Fetch and parse the full text of an arXiv paper.
 
@@ -124,10 +126,7 @@ def get_paper_full_text(arxiv_id: str) -> FullTextResult:
         return FullTextResult(
             success=False,
             arxiv_id=cleaned,
-            error=(
-                metadata_result.error
-                or f"Could not fetch metadata for {cleaned}"
-            ),
+            error=(metadata_result.error or f"Could not fetch metadata for {cleaned}"),
         )
 
     paper = metadata_result.paper
