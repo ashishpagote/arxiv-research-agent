@@ -1,7 +1,7 @@
 [project]
 name = "arxiv-agent"
 version = "0.1.0"
-description = "Add your description here"
+description = "LLM-driven agent that searches arXiv, reads papers, and returns structured cited answers with confidence assessments"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
