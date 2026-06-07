@@ -1,12 +1,11 @@
 """Run the agent against the eval dataset and save raw answers to disk."""
+
 from __future__ import annotations
-from anthropic import APIStatusError, RateLimitError
 
 import json
-import sys
 import time
 import traceback
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -23,7 +22,6 @@ from arxiv_agent.agent.graph import run_agent
 from arxiv_agent.agent.schemas import AgentAnswer
 from arxiv_agent.config import PRIMARY_MODEL, PROJECT_ROOT
 from arxiv_agent.eval.loader import EvalQuestion
-
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -47,51 +45,21 @@ def answer_path(run_name: str, question_id: int) -> Path:
 
 def metadata_path(run_name: str) -> Path:
     return run_dir(run_name) / "run_metadata.json"
-# ---------------------------------------------------------------------------
-# Retry helper
-# ---------------------------------------------------------------------------
 
-DEFAULT_MAX_RETRIES = 5
-DEFAULT_BASE_WAIT = 15.0  # seconds
-
-
-def _retry_run_agent(
-    question_text: str,
-    *,
-    max_retries: int = DEFAULT_MAX_RETRIES,
-    base_wait: float = DEFAULT_BASE_WAIT,
-):
-    """Run the agent, retrying on rate-limit errors with exponential backoff.
-
-    On rate-limit errors, wait base_wait * 2^attempt seconds, up to a cap.
-    Other errors propagate immediately.
-    """
-    for attempt in range(max_retries):
-        try:
-            return run_agent(question_text)
-        except (RateLimitError, APIStatusError) as exc:
-            # Only retry on 429 specifically
-            status_code = getattr(exc, "status_code", None)
-            if status_code != 429 and not isinstance(exc, RateLimitError):
-                raise
-            wait = min(base_wait * (2**attempt), 120.0)
-            print(
-                f"[runner] Rate limited (attempt {attempt + 1}/{max_retries}); "
-                f"waiting {wait:.0f}s before retry",
-                file=sys.stderr,
-                flush=True,
-            )
-            time.sleep(wait)
-    # If we exhaust retries, raise the final error
-    raise RuntimeError(
-        f"Exhausted {max_retries} retries on rate-limit errors"
-    )
 
 # ---------------------------------------------------------------------------
 # Saving and loading answers
 # ---------------------------------------------------------------------------
 
-def save_answer(run_name: str, question: EvalQuestion, answer: AgentAnswer, *, error: str | None = None, elapsed_seconds: float | None = None) -> None:
+
+def save_answer(
+    run_name: str,
+    question: EvalQuestion,
+    answer: AgentAnswer,
+    *,
+    error: str | None = None,
+    elapsed_seconds: float | None = None,
+) -> None:
     """Persist a single question's answer to disk."""
     path = answer_path(run_name, question.id)
     payload: dict[str, Any] = {
@@ -101,7 +69,7 @@ def save_answer(run_name: str, question: EvalQuestion, answer: AgentAnswer, *, e
         "agent_answer": answer.model_dump(mode="json"),
         "error": error,
         "elapsed_seconds": elapsed_seconds,
-        "saved_at": datetime.now(timezone.utc).isoformat(),
+        "saved_at": datetime.now(UTC).isoformat(),
     }
     path.write_text(json.dumps(payload, indent=2))
 
@@ -126,11 +94,12 @@ def has_answer(run_name: str, question_id: int) -> bool:
 # Run metadata
 # ---------------------------------------------------------------------------
 
+
 def save_run_metadata(run_name: str, question_ids: list[int]) -> None:
     """Persist information about this run for later analysis."""
     meta = {
         "run_name": run_name,
-        "started_at": datetime.now(timezone.utc).isoformat(),
+        "started_at": datetime.now(UTC).isoformat(),
         "model": PRIMARY_MODEL,
         "question_ids": sorted(question_ids),
         "num_questions": len(question_ids),
@@ -141,6 +110,7 @@ def save_run_metadata(run_name: str, question_ids: list[int]) -> None:
 # ---------------------------------------------------------------------------
 # The runner
 # ---------------------------------------------------------------------------
+
 
 def run_eval(
     questions: list[EvalQuestion],
@@ -200,7 +170,7 @@ def run_eval(
 
             t0 = time.time()
             try:
-                answer = _retry_run_agent(question.question)
+                answer = run_agent(question.question)
                 elapsed = time.time() - t0
                 save_answer(
                     run_name,

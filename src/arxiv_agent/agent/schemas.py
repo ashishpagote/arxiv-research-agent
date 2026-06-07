@@ -1,10 +1,10 @@
 """Pydantic schemas for the agent's structured output."""
+
 from __future__ import annotations
 
 from typing import Literal
 
 from pydantic import BaseModel, Field
-
 
 # ---------------------------------------------------------------------------
 # Enumerations
@@ -25,15 +25,14 @@ ConfidenceLevel = Literal["high", "medium", "low"]
 # Sub-schemas
 # ---------------------------------------------------------------------------
 
+
 class Citation(BaseModel):
     """A single citation linking a claim to a specific paper."""
 
     arxiv_id: str = Field(
         description="The arXiv ID of the cited paper (e.g. '2106.09685')."
     )
-    title: str = Field(
-        description="The title of the cited paper."
-    )
+    title: str = Field(description="The title of the cited paper.")
     supports_claim: str = Field(
         description=(
             "A brief description of the specific claim this citation supports. "
@@ -45,6 +44,7 @@ class Citation(BaseModel):
 # ---------------------------------------------------------------------------
 # Top-level agent output
 # ---------------------------------------------------------------------------
+
 
 class AgentAnswer(BaseModel):
     """The structured output produced by the agent for every query."""

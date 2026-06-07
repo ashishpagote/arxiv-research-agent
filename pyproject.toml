@@ -1,7 +1,7 @@
 [project]
 name = "arxiv-agent"
 version = "0.1.0"
-description = "Add your description here"
+description = "LLM-driven agent that searches arXiv, reads papers, and returns structured cited answers with confidence assessments"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -16,6 +16,7 @@ dependencies = [
     "python-dotenv>=1.2.2",
     "pyyaml>=6.0.3",
     "rich>=15.0.0",
+    "tenacity>=9.0.0",
     "typer>=0.25.1",
 ]
 
@@ -28,8 +29,39 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "black>=25.0.0",
     "ipykernel>=7.2.0",
+    "isort>=5.13.0",
+    "pre-commit>=4.0.0",
     "pytest>=9.0.3",
     "pytest-asyncio>=1.3.0",
     "ruff>=0.15.12",
 ]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+]
+# E501 (line too long) is enforced by black; skip it here
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# typer requires Option/Argument in function defaults — B008 is a false positive here
+"src/arxiv_agent/cli.py" = ["B008"]

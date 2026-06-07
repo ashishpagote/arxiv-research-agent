@@ -1,7 +1,7 @@
 """Command-line interface for the arXiv research agent."""
+
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -41,6 +41,7 @@ def ask(
     if quiet:
         # Redirect stderr to /dev/null for the duration of the run
         import os
+
         sys.stderr = open(os.devnull, "w")
 
     console.print(Panel(question, title="Question", border_style="cyan"))

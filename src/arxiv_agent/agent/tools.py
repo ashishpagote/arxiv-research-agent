@@ -6,6 +6,7 @@ The LLM sees these wrappers, which:
   - Return strings (not Pydantic objects)
   - Format errors and edge cases clearly so the LLM can react sensibly
 """
+
 from __future__ import annotations
 
 import json
@@ -13,16 +14,14 @@ import json
 from langchain_core.tools import tool
 
 from arxiv_agent.tools.content import get_paper_full_text as _get_full_text
-from arxiv_agent.tools.metadata import (
-    get_paper_metadata as _get_metadata,
-    verify_arxiv_id as _verify,
-)
+from arxiv_agent.tools.metadata import get_paper_metadata as _get_metadata
+from arxiv_agent.tools.metadata import verify_arxiv_id as _verify
 from arxiv_agent.tools.search import search_arxiv as _search
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _format_paper_brief(paper) -> dict:
     """Format a PaperMetadata into a brief dict for tool output."""
@@ -39,6 +38,7 @@ def _format_paper_brief(paper) -> dict:
 # ---------------------------------------------------------------------------
 # Tools exposed to the LLM
 # ---------------------------------------------------------------------------
+
 
 @tool
 def search_arxiv(
@@ -68,18 +68,22 @@ def search_arxiv(
     if year_start is not None and year_end is not None:
         year_range = (year_start, year_end)
     elif year_start is not None or year_end is not None:
-        return json.dumps({
-            "error": "Both year_start and year_end must be provided together, or neither."
-        })
+        return json.dumps(
+            {
+                "error": "Both year_start and year_end must be provided together, or neither."
+            }
+        )
 
     result = _search(query=query, max_results=max_results, year_range=year_range)
     if not result.success:
         return json.dumps({"error": result.error})
 
-    return json.dumps({
-        "papers": [_format_paper_brief(p) for p in result.papers],
-        "total": result.total_returned,
-    })
+    return json.dumps(
+        {
+            "papers": [_format_paper_brief(p) for p in result.papers],
+            "total": result.total_returned,
+        }
+    )
 
 
 @tool
@@ -100,11 +104,13 @@ def verify_arxiv_id(arxiv_id: str) -> str:
     if not result.success:
         return json.dumps({"error": result.error or "Verification failed."})
 
-    return json.dumps({
-        "arxiv_id": result.arxiv_id,
-        "exists": result.exists,
-        "title": result.title,
-    })
+    return json.dumps(
+        {
+            "arxiv_id": result.arxiv_id,
+            "exists": result.exists,
+            "title": result.title,
+        }
+    )
 
 
 @tool
@@ -145,13 +151,15 @@ def get_paper_full_text(arxiv_id: str) -> str:
     if not result.success:
         return json.dumps({"error": result.error or "Full text fetch failed."})
 
-    return json.dumps({
-        "arxiv_id": result.arxiv_id,
-        "title": result.title,
-        "num_pages": result.num_pages,
-        "char_count": result.char_count,
-        "text": result.text,
-    })
+    return json.dumps(
+        {
+            "arxiv_id": result.arxiv_id,
+            "title": result.title,
+            "num_pages": result.num_pages,
+            "char_count": result.char_count,
+            "text": result.text,
+        }
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -5,26 +5,26 @@ saves the result, and prints a summary.
 
 LLM-as-judge synthesis scoring is added in a separate module later.
 """
+
 from __future__ import annotations
 
 import json
-from collections import Counter, defaultdict
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
 from rich.console import Console
 from rich.table import Table
 
-from arxiv_agent.config import PROJECT_ROOT
 from arxiv_agent.eval.loader import EvalQuestion, load_dataset
 from arxiv_agent.eval.runner import load_answer, run_dir
-from arxiv_agent.eval.scorers.refusal import RefusalScore, score_refusal
-from arxiv_agent.eval.scorers.retrieval import RetrievalScore, score_retrieval
-
+from arxiv_agent.eval.scorers.refusal import score_refusal
+from arxiv_agent.eval.scorers.retrieval import score_retrieval
 
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
+
 
 def score_path(run_name: str, question_id: int) -> Path:
     return run_dir(run_name) / "scores" / f"{question_id:03d}.json"
@@ -33,6 +33,7 @@ def score_path(run_name: str, question_id: int) -> Path:
 # ---------------------------------------------------------------------------
 # Score one question
 # ---------------------------------------------------------------------------
+
 
 def score_question(run_name: str, question: EvalQuestion) -> dict[str, Any] | None:
     """Score a single question. Returns the score payload, or None if no answer exists."""
@@ -74,6 +75,7 @@ def score_question(run_name: str, question: EvalQuestion) -> dict[str, Any] | No
 # Score the whole run
 # ---------------------------------------------------------------------------
 
+
 def score_run(run_name: str) -> dict[str, Any]:
     """Score every answered question in the run and print a summary."""
     console = Console()
@@ -82,14 +84,14 @@ def score_run(run_name: str) -> dict[str, Any]:
 
     # Find which questions have answers in this run
     answers_dir = run_dir(run_name) / "answers"
-    answered_ids = sorted(
-        int(f.stem) for f in answers_dir.glob("*.json")
-    )
+    answered_ids = sorted(int(f.stem) for f in answers_dir.glob("*.json"))
 
     scored: list[dict[str, Any]] = []
     for qid in answered_ids:
         if qid not in by_id:
-            console.print(f"[yellow]Warning:[/yellow] qid={qid} in answers but not in dataset")
+            console.print(
+                f"[yellow]Warning:[/yellow] qid={qid} in answers but not in dataset"
+            )
             continue
         payload = score_question(run_name, by_id[qid])
         if payload is not None:
@@ -103,7 +105,10 @@ def score_run(run_name: str) -> dict[str, Any]:
 # Summary printer
 # ---------------------------------------------------------------------------
 
-def _print_summary(console: Console, run_name: str, scored: list[dict[str, Any]]) -> None:
+
+def _print_summary(
+    console: Console, run_name: str, scored: list[dict[str, Any]]
+) -> None:
     if not scored:
         console.print("[red]No questions scored.[/red]")
         return
@@ -157,7 +162,9 @@ def _print_summary(console: Console, run_name: str, scored: list[dict[str, Any]]
 
     # Aggregate metrics
     console.print()
-    console.print(Table.grid().add_row(f"[bold]Aggregate metrics ({n} questions)[/bold]"))
+    console.print(
+        Table.grid().add_row(f"[bold]Aggregate metrics ({n} questions)[/bold]")
+    )
 
     # Retrieval pass rate (excluding skipped)
     ret_evaluable = [s for s in scored if not s["retrieval"].get("skipped")]
@@ -183,7 +190,9 @@ def _print_summary(console: Console, run_name: str, scored: list[dict[str, Any]]
     should_not_refuse = [s for s in scored if not s["refusal"]["should_refuse"]]
     if should_not_refuse:
         false_refusals = sum(
-            1 for s in should_not_refuse if s["refusal"]["failure_mode"] == "false_refusal"
+            1
+            for s in should_not_refuse
+            if s["refusal"]["failure_mode"] == "false_refusal"
         )
         console.print(
             f"    False-refusal rate: {false_refusals}/{len(should_not_refuse)} "
@@ -215,9 +224,7 @@ def _print_summary(console: Console, run_name: str, scored: list[dict[str, Any]]
     for cat, items in sorted(by_cat.items()):
         ret_eval = [s for s in items if not s["retrieval"].get("skipped")]
         ret_pass = sum(1 for s in ret_eval if s["retrieval"]["passed"])
-        ret_cell = (
-            f"{ret_pass}/{len(ret_eval)}" if ret_eval else "n/a"
-        )
+        ret_cell = f"{ret_pass}/{len(ret_eval)}" if ret_eval else "n/a"
         ref_pass = sum(1 for s in items if s["refusal"]["passed"])
         ex = sum(1 for s in items if s["is_exception"])
         up = sum(1 for s in items if s["is_unparseable"])

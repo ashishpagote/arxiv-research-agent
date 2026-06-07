@@ -4,13 +4,13 @@ If Langfuse keys are configured in the environment, calls to the agent are
 traced automatically. If not configured, this module is a no-op and the
 agent runs normally without tracing.
 """
+
 from __future__ import annotations
 
 import sys
 from typing import Any
 
 from arxiv_agent.config import (
-    LANGFUSE_HOST,
     LANGFUSE_PUBLIC_KEY,
     LANGFUSE_SECRET_KEY,
 )

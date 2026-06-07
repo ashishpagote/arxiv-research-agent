@@ -1,12 +1,13 @@
 """Tests for search_arxiv."""
+
 import pytest
 
 from arxiv_agent.tools.search import _build_query, search_arxiv
 
-
 # ---------------------------------------------------------------------------
 # Query construction (no network)
 # ---------------------------------------------------------------------------
+
 
 class TestBuildQuery:
     def test_simple_query_passthrough(self):
@@ -34,6 +35,7 @@ class TestBuildQuery:
 # ---------------------------------------------------------------------------
 # Input validation (no network)
 # ---------------------------------------------------------------------------
+
 
 class TestSearchInputValidation:
     def test_empty_query(self):
@@ -63,6 +65,7 @@ class TestSearchInputValidation:
 # Real searches (cached after first run)
 # ---------------------------------------------------------------------------
 
+
 class TestSearchArxiv:
     def test_lora_search_returns_results(self):
         result = search_arxiv("LoRA low-rank adaptation", max_results=5)
@@ -70,9 +73,7 @@ class TestSearchArxiv:
         assert result.total_returned > 0
         assert len(result.papers) <= 5
 
-        text_blob = " ".join(
-            f"{p.title} {p.abstract}".lower() for p in result.papers
-        )
+        text_blob = " ".join(f"{p.title} {p.abstract}".lower() for p in result.papers)
         assert "lora" in text_blob or "low-rank" in text_blob
 
     def test_papers_have_required_fields(self):
@@ -87,9 +88,7 @@ class TestSearchArxiv:
             assert p.published_date is not None
 
     def test_year_range_filter(self):
-        result = search_arxiv(
-            "language models", max_results=5, year_range=(2024, 2024)
-        )
+        result = search_arxiv("language models", max_results=5, year_range=(2024, 2024))
         assert result.success
         for p in result.papers:
             assert p.published_date.year == 2024

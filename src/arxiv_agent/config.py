@@ -1,4 +1,5 @@
 """Central configuration for the arxiv-agent package."""
+
 from __future__ import annotations
 
 import os
@@ -39,3 +40,9 @@ CACHE_DIR.mkdir(exist_ok=True)
 # arXiv asks for max 1 request per 3 seconds; we use a generous buffer
 ARXIV_DELAY_SECONDS: float = 3.5
 ARXIV_NUM_RETRIES: int = 5
+
+
+# === LLM retry (rate-limit backoff) ===
+RETRY_MAX_ATTEMPTS: int = int(os.getenv("RETRY_MAX_ATTEMPTS", "5"))
+RETRY_BASE_WAIT_SECONDS: float = float(os.getenv("RETRY_BASE_WAIT_SECONDS", "15.0"))
+RETRY_MAX_WAIT_SECONDS: float = float(os.getenv("RETRY_MAX_WAIT_SECONDS", "120.0"))

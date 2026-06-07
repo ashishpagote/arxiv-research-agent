@@ -4,8 +4,10 @@ Sanity check script: verifies arXiv API + Anthropic API both work.
 Run with:
     uv run python scripts/hello_world.py
 """
+
 import os
 import sys
+
 from dotenv import load_dotenv
 from rich.console import Console
 from rich.panel import Panel
@@ -41,7 +43,9 @@ def test_arxiv():
 
     paper = results[0]
     console.print(f"[green]✓[/green] Fetched paper: [bold]{paper.title}[/bold]")
-    console.print(f"  Authors: {', '.join(a.name for a in paper.authors[:3])}{'...' if len(paper.authors) > 3 else ''}")
+    console.print(
+        f"  Authors: {', '.join(a.name for a in paper.authors[:3])}{'...' if len(paper.authors) > 3 else ''}"
+    )
     console.print(f"  Published: {paper.published.date()}")
     console.print(f"  Categories: {', '.join(paper.categories)}")
     return paper
@@ -73,11 +77,15 @@ def test_anthropic(api_key: str, paper):
     response_text = message.content[0].text
     console.print(f"[green]✓[/green] Claude responded with model [bold]{model}[/bold]")
     console.print(Panel(response_text, title="Claude's response", border_style="cyan"))
-    console.print(f"  Tokens used: {message.usage.input_tokens} input, {message.usage.output_tokens} output")
+    console.print(
+        f"  Tokens used: {message.usage.input_tokens} input, {message.usage.output_tokens} output"
+    )
 
 
 def main():
-    console.print(Panel.fit("arXiv Research Agent - Environment Sanity Check", style="bold blue"))
+    console.print(
+        Panel.fit("arXiv Research Agent - Environment Sanity Check", style="bold blue")
+    )
 
     api_key = check_env()
     paper = test_arxiv()
