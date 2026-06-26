@@ -1,0 +1,42 @@
+{
+  "question_id": 2,
+  "category": "literature_review",
+  "agent_question_type": "literature_review",
+  "agent_confidence": "high",
+  "iterations_used": 6,
+  "is_exception": false,
+  "is_unparseable": false,
+  "retrieval": {
+    "question_id": 2,
+    "retrieval_type": "topical",
+    "skipped": false,
+    "passed": true,
+    "topics": [
+      {
+        "topic": "RAG",
+        "found": true,
+        "matching_papers": [
+          "2005.11401",
+          "2002.08909",
+          "2007.01282"
+        ]
+      },
+      {
+        "topic": "retrieval-augmented generation",
+        "found": true,
+        "matching_papers": [
+          "2005.11401"
+        ]
+      }
+    ],
+    "required_paper_check": null,
+    "notes": null
+  },
+  "refusal": {
+    "question_id": 2,
+    "should_refuse": false,
+    "actually_refused": false,
+    "passed": true,
+    "failure_mode": null
+  }
+}

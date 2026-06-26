@@ -1,0 +1,47 @@
+{
+  "question_id": 17,
+  "category": "comparison",
+  "agent_question_type": "comparison",
+  "agent_confidence": "high",
+  "iterations_used": 5,
+  "is_exception": false,
+  "is_unparseable": false,
+  "retrieval": {
+    "question_id": 17,
+    "retrieval_type": "topical",
+    "skipped": false,
+    "passed": true,
+    "topics": [
+      {
+        "topic": "RLHF",
+        "found": true,
+        "matching_papers": [
+          "2305.18290"
+        ]
+      },
+      {
+        "topic": "DPO",
+        "found": true,
+        "matching_papers": [
+          "2305.18290"
+        ]
+      },
+      {
+        "topic": "PPO",
+        "found": true,
+        "matching_papers": [
+          "2305.18290"
+        ]
+      }
+    ],
+    "required_paper_check": null,
+    "notes": null
+  },
+  "refusal": {
+    "question_id": 17,
+    "should_refuse": false,
+    "actually_refused": false,
+    "passed": true,
+    "failure_mode": null
+  }
+}

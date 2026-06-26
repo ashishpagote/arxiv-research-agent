@@ -1,0 +1,45 @@
+{
+  "question_id": 1,
+  "category": "literature_review",
+  "agent_question_type": "literature_review",
+  "agent_confidence": "high",
+  "iterations_used": 7,
+  "is_exception": false,
+  "is_unparseable": false,
+  "retrieval": {
+    "question_id": 1,
+    "retrieval_type": "topical",
+    "skipped": false,
+    "passed": true,
+    "topics": [
+      {
+        "topic": "RLHF",
+        "found": true,
+        "matching_papers": [
+          "2305.18290",
+          "2309.00267",
+          "2312.14925"
+        ]
+      },
+      {
+        "topic": "reinforcement learning from human feedback",
+        "found": true,
+        "matching_papers": [
+          "2203.02155",
+          "2305.18290",
+          "2309.00267",
+          "2312.14925"
+        ]
+      }
+    ],
+    "required_paper_check": null,
+    "notes": null
+  },
+  "refusal": {
+    "question_id": 1,
+    "should_refuse": false,
+    "actually_refused": false,
+    "passed": true,
+    "failure_mode": null
+  }
+}

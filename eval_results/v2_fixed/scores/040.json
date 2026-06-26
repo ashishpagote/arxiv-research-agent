@@ -1,0 +1,29 @@
+{
+  "question_id": 40,
+  "category": "explain_paper",
+  "agent_question_type": "cannot_answer",
+  "agent_confidence": "low",
+  "iterations_used": 3,
+  "is_exception": false,
+  "is_unparseable": true,
+  "retrieval": {
+    "question_id": 40,
+    "retrieval_type": "specific_paper",
+    "skipped": false,
+    "passed": false,
+    "topics": [],
+    "required_paper_check": {
+      "required_paper": "2203.02155",
+      "found": false,
+      "papers_consulted": []
+    },
+    "notes": "Required paper 2203.02155 not in papers_consulted."
+  },
+  "refusal": {
+    "question_id": 40,
+    "should_refuse": false,
+    "actually_refused": true,
+    "passed": false,
+    "failure_mode": "false_refusal"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "question_id": 4,
+  "category": "literature_review",
+  "agent_question_type": "cannot_answer",
+  "agent_confidence": "low",
+  "iterations_used": 5,
+  "is_exception": false,
+  "is_unparseable": true,
+  "retrieval": {
+    "question_id": 4,
+    "retrieval_type": "topical",
+    "skipped": false,
+    "passed": false,
+    "topics": [
+      {
+        "topic": "chain-of-thought",
+        "found": false,
+        "matching_papers": []
+      },
+      {
+        "topic": "CoT",
+        "found": false,
+        "matching_papers": []
+      }
+    ],
+    "required_paper_check": null,
+    "notes": "Missing topics: ['chain-of-thought', 'CoT']"
+  },
+  "refusal": {
+    "question_id": 4,
+    "should_refuse": false,
+    "actually_refused": true,
+    "passed": false,
+    "failure_mode": "false_refusal"
+  }
+}
