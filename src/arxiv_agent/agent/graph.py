@@ -17,15 +17,12 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 
+from arxiv_agent import config as agent_config
 from arxiv_agent.agent.prompts import get_system_prompt
 from arxiv_agent.agent.retry import with_llm_retry
 from arxiv_agent.agent.schemas import AgentAnswer
 from arxiv_agent.agent.tools import ALL_TOOLS
-from arxiv_agent.config import (
-    ANTHROPIC_API_KEY,
-    MAX_AGENT_ITERATIONS,
-    PRIMARY_MODEL,
-)
+from arxiv_agent.config import ANTHROPIC_API_KEY, PRIMARY_MODEL
 
 # ---------------------------------------------------------------------------
 # State
@@ -114,9 +111,10 @@ def should_continue(state: AgentState) -> str:
 
     End otherwise.
     """
-    if state["iterations"] >= MAX_AGENT_ITERATIONS:
+    max_iterations = agent_config.MAX_AGENT_ITERATIONS
+    if state["iterations"] >= max_iterations:
         print(
-            f"[agent] hit max iterations ({MAX_AGENT_ITERATIONS}); forcing end",
+            f"[agent] hit max iterations ({max_iterations}); forcing end",
             file=sys.stderr,
             flush=True,
         )
@@ -269,21 +267,26 @@ def run_agent(question: str) -> AgentAnswer:
         "iterations": 0,
     }
 
-    config: dict = {"recursion_limit": MAX_AGENT_ITERATIONS * 3}
+    # Read the iteration cap at call time so config changes take effect without
+    # a process restart. recursion_limit must cover agent+tool steps per
+    # iteration plus a small buffer, hence *2 + 2.
+    invoke_config: dict = {
+        "recursion_limit": agent_config.MAX_AGENT_ITERATIONS * 2 + 2
+    }
 
     handler = get_callback_handler()
     if handler is not None:
-        config["callbacks"] = [handler]
+        invoke_config["callbacks"] = [handler]
         # Tag traces so they're easy to find in the Langfuse UI
-        config["metadata"] = {
+        invoke_config["metadata"] = {
             "agent": "arxiv-research-agent",
             "version": "v1",
         }
-        config["tags"] = ["arxiv-agent", "v1"]
-        config["run_name"] = f"arxiv-agent: {question[:60]}"
+        invoke_config["tags"] = ["arxiv-agent", "v1"]
+        invoke_config["run_name"] = f"arxiv-agent: {question[:60]}"
 
     try:
-        final_state = graph.invoke(initial_state, config=config)
+        final_state = graph.invoke(initial_state, config=invoke_config)
     finally:
         flush()  # ensure traces get sent even if invoke raises
 

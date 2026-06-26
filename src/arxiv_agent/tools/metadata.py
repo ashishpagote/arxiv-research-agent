@@ -8,7 +8,7 @@ from datetime import date
 
 import arxiv
 
-from arxiv_agent.tools._arxiv_client import get_client
+from arxiv_agent.tools._arxiv_client import fetch_results
 from arxiv_agent.tools.cache import cache_get_json, cache_set_json
 from arxiv_agent.tools.schemas import (
     MetadataResult,
@@ -113,9 +113,8 @@ def verify_arxiv_id(arxiv_id: str) -> VerifyResult:
         flush=True,
     )
     try:
-        client = get_client()
         search = arxiv.Search(id_list=[cleaned])
-        results = list(client.results(search))
+        results = fetch_results(search)
     except Exception as exc:  # noqa: BLE001 - we want to surface the error string
         return VerifyResult(
             success=False,
@@ -172,9 +171,8 @@ def get_paper_metadata(arxiv_id: str) -> MetadataResult:
         flush=True,
     )
     try:
-        client = get_client()
         search = arxiv.Search(id_list=[cleaned])
-        results = list(client.results(search))
+        results = fetch_results(search)
     except Exception as exc:  # noqa: BLE001
         return MetadataResult(
             success=False,

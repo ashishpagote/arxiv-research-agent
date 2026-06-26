@@ -7,7 +7,7 @@ import sys
 
 import arxiv
 
-from arxiv_agent.tools._arxiv_client import get_client
+from arxiv_agent.tools._arxiv_client import fetch_results
 from arxiv_agent.tools.cache import cache_get_json, cache_set_json
 from arxiv_agent.tools.metadata import _to_metadata
 from arxiv_agent.tools.schemas import PaperMetadata, SearchResult
@@ -111,13 +111,12 @@ def search_arxiv(
         flush=True,
     )
     try:
-        client = get_client()
         search = arxiv.Search(
             query=full_query,
             max_results=max_results,
             sort_by=arxiv.SortCriterion.Relevance,
         )
-        raw_results = list(client.results(search))
+        raw_results = fetch_results(search)
         print(
             f"[search_arxiv] Got {len(raw_results)} results",
             file=sys.stderr,

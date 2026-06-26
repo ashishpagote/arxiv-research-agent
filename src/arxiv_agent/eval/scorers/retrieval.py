@@ -89,6 +89,18 @@ def score_retrieval(
     """
     reqs = question.retrieval_requirements
 
+    # Questions that expect a refusal (e.g. fabricated arXiv IDs) have no
+    # genuine retrieval target. The agent correctly refusing means there are
+    # no papers to consult, so retrieval is N/A regardless of retrieval_type.
+    if question.refusal_requirements and question.refusal_requirements.should_refuse:
+        return RetrievalScore(
+            question_id=question.id,
+            retrieval_type=reqs.type,
+            skipped=True,
+            passed=True,  # vacuously passes
+            notes="Skipped: question expects a refusal.",
+        )
+
     # Type 'none': no retrieval expected; treat as N/A.
     if reqs.type == "none":
         return RetrievalScore(
