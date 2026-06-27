@@ -1,0 +1,51 @@
+{
+  "question_id": 4,
+  "category": "literature_review",
+  "agent_question_type": "literature_review",
+  "agent_confidence": "high",
+  "iterations_used": 6,
+  "is_exception": false,
+  "is_unparseable": false,
+  "retrieval": {
+    "question_id": 4,
+    "retrieval_type": "topical",
+    "skipped": false,
+    "passed": true,
+    "topics": [
+      {
+        "topic": "chain-of-thought",
+        "found": true,
+        "matching_papers": [
+          "2201.11903",
+          "2203.11171",
+          "2205.10625",
+          "2305.10601",
+          "2305.04091",
+          "2305.17306",
+          "2503.09567",
+          "2511.05184"
+        ]
+      },
+      {
+        "topic": "CoT",
+        "found": true,
+        "matching_papers": [
+          "2205.11916",
+          "2305.04091",
+          "2404.14812",
+          "2503.09567",
+          "2511.05184"
+        ]
+      }
+    ],
+    "required_paper_check": null,
+    "notes": null
+  },
+  "refusal": {
+    "question_id": 4,
+    "should_refuse": false,
+    "actually_refused": false,
+    "passed": true,
+    "failure_mode": null
+  }
+}

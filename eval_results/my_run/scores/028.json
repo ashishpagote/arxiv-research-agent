@@ -1,0 +1,33 @@
+{
+  "question_id": 28,
+  "category": "specific_result",
+  "agent_question_type": "specific_result",
+  "agent_confidence": "high",
+  "iterations_used": 3,
+  "is_exception": false,
+  "is_unparseable": false,
+  "retrieval": {
+    "question_id": 28,
+    "retrieval_type": "topical",
+    "skipped": false,
+    "passed": true,
+    "topics": [
+      {
+        "topic": "LoRA",
+        "found": true,
+        "matching_papers": [
+          "2106.09685"
+        ]
+      }
+    ],
+    "required_paper_check": null,
+    "notes": null
+  },
+  "refusal": {
+    "question_id": 28,
+    "should_refuse": false,
+    "actually_refused": false,
+    "passed": true,
+    "failure_mode": null
+  }
+}

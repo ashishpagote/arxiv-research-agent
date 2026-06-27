@@ -1,0 +1,34 @@
+{
+  "question_id": 30,
+  "category": "specific_result",
+  "agent_question_type": "specific_result",
+  "agent_confidence": "high",
+  "iterations_used": 4,
+  "is_exception": false,
+  "is_unparseable": false,
+  "retrieval": {
+    "question_id": 30,
+    "retrieval_type": "topical",
+    "skipped": false,
+    "passed": true,
+    "topics": [
+      {
+        "topic": "speculative decoding",
+        "found": true,
+        "matching_papers": [
+          "2203.16487",
+          "2211.17192"
+        ]
+      }
+    ],
+    "required_paper_check": null,
+    "notes": null
+  },
+  "refusal": {
+    "question_id": 30,
+    "should_refuse": false,
+    "actually_refused": false,
+    "passed": true,
+    "failure_mode": null
+  }
+}
